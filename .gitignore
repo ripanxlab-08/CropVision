@@ -1,0 +1,35 @@
+# Environment & IDE
+.env
+.venv/
+.idea/
+*.swp
+*.swo
+
+# Flutter / Dart
+mobile_app/.dart_tool/
+mobile_app/.flutter-plugins
+mobile_app/.flutter-plugins-dependencies
+mobile_app/build/
+mobile_app/.idea/
+mobile_app/android/local.properties
+mobile_app/ios/Flutter/Flutter.framework
+mobile_app/ios/Pods/
+
+# Python / ML Datasets & Weights
+ml/venv/
+ml/__pycache__/
+ml/*.pyc
+ml/checkpoints/
+ml/dataset/
+ml/plantvillage_extracted/
+ml/plantvillage_files/
+ml/test_images/
+ml/*.pt
+ml/*.onnx
+ml/*.pth
+ml/*.tflite
+ml/*.h5
+
+# General
+.DS_Store
+*.log
