@@ -61,25 +61,46 @@ class _CaptureScreenState extends State<CaptureScreen> {
   }
 
   /// Calls the real trained model, served locally by
-  /// ml/inference_server.py. Falls back to a clear error (not a silent
-  /// fake result) if the server isn't reachable - that's much easier
-  /// to diagnose than a confident-looking wrong answer.
+  /// ml/inference_server.py. Tries localhost (USB adb reverse) first,
+  /// then falls back to the PC's Wi-Fi IP (10.12.103.0).
   Future<(String, double)> _classifyDisease(Uint8List bytes) async {
-    final request = http.MultipartRequest('POST', Uri.parse(kInferenceServerUrl))
-      ..files.add(http.MultipartFile.fromBytes('image', bytes, filename: 'leaf.jpg'));
+    final candidateUrls = [
+      'http://localhost:8000/classify',
+      'http://10.12.103.0:8000/classify',
+    ];
 
-    final streamedResponse = await request.send();
-    final response = await http.Response.fromStream(streamedResponse);
+    Object? lastError;
 
-    if (response.statusCode != 200) {
-      throw Exception(
-          'Inference server error (${response.statusCode}): ${response.body}. '
-          'Is ml/inference_server.py running, and did you run '
-          '"adb reverse tcp:8000 tcp:8000"?');
+    for (final url in candidateUrls) {
+      try {
+        final request = http.MultipartRequest('POST', Uri.parse(url))
+          ..files.add(http.MultipartFile.fromBytes('image', bytes, filename: 'leaf.jpg'));
+
+        final streamedResponse =
+            await request.send().timeout(const Duration(seconds: 10));
+        final response = await http.Response.fromStream(streamedResponse);
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body) as Map<String, dynamic>;
+          return (
+            data['predicted_class'] as String,
+            (data['confidence'] as num).toDouble()
+          );
+        } else {
+          lastError = Exception(
+              'Server returned status ${response.statusCode}: ${response.body}');
+        }
+      } catch (e) {
+        lastError = e;
+      }
     }
 
-    final data = jsonDecode(response.body) as Map<String, dynamic>;
-    return (data['predicted_class'] as String, (data['confidence'] as num).toDouble());
+    throw Exception(
+        'Cannot reach ML Inference Server.\n\n'
+        '• If phone is connected via USB: Run "adb reverse tcp:8000 tcp:8000" on PC.\n'
+        '• If on Wi-Fi: Ensure phone & PC are on the same network.\n'
+        '• Ensure "python ml/inference_server.py" is running on PC.\n'
+        'Details: $lastError');
   }
 
   Future<void> _submit() async {
