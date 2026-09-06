@@ -1,7 +1,7 @@
 -- ============================================================
 -- Seed: treatment_guidelines
 -- ============================================================
--- Auto-generated from ml/treatment_recommendations.py to keep the
+-- Auto-generated from model/treatment_recommendations.py to keep the
 -- Python pipeline (used for the ML side / testing) and the
 -- Supabase DB (used by the Flutter app) in sync. Regenerate this
 -- file whenever treatment_recommendations.py changes, rather than

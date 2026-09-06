@@ -1,7 +1,7 @@
 -- ============================================================
 -- Seed: crops
 -- ============================================================
--- Auto-generated from ml/supported_crops.py to keep the DB's crop
+-- Auto-generated from model/supported_crops.py to keep the DB's crop
 -- registry in sync with what the model actually supports. Run
 -- this AFTER supabase_schema.sql and BEFORE seed_treatment_guidelines.sql.
 

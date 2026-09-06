@@ -1,4 +1,4 @@
-/// Crop Growth Calendar - Dart mirror of ml/crop_growth_calendar.py.
+/// Crop Growth Calendar - Dart mirror of model/crop_growth_calendar.py.
 /// Keep both in sync if the day ranges change.
 ///
 /// Since our capture flow photographs a single LEAF close-up (for

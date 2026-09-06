@@ -10,7 +10,7 @@ project/
 │   │   ├── services/    # SupabaseService, InferenceService
 │   │   └── models/      # Diagnosis model
 │   └── pubspec.yaml
-├── ml/                  # Python + PyTorch pipeline
+├── model/               # Python + PyTorch pipeline
 │   ├── image_verification.py     # Quality + Validity checks (Phase 2, step 8)
 │   ├── severity_estimation.py    # G0-G3 severity via HSV segmentation (step 13)
 │   ├── train_mobilevit.py        # MobileViT Small training (steps 9-12)
@@ -50,7 +50,7 @@ flutter run
 ### 2. Python + PyTorch setup
 
 ```bash
-cd ml
+cd model
 python3 -m venv venv
 source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt --break-system-packages
@@ -84,7 +84,7 @@ Auth → Postgres RLS-protected insert) is working before moving to Phase 2.
 
 ### Step 7 — Supported crops/diseases
 
-`ml/supported_crops.py` is the single source of truth for which
+`model/supported_crops.py` is the single source of truth for which
 crop/disease classes the app supports (25 classes across Apple, Corn,
 Grape, Potato, Tomato from PlantVillage). Run it directly to see the
 full list: `python supported_crops.py`. Expand/trim this before
@@ -92,8 +92,8 @@ training — it must match your dataset folder names exactly.
 
 ### Step 8 — Image Verification (tested)
 
-`ml/image_verification.py` was tested against 5 synthetic images in
-`ml/test_images/` (healthy, diseased, blurry, dark, non-plant) and
+`model/image_verification.py` was tested against 5 synthetic images in
+`model/test_images/` (healthy, diseased, blurry, dark, non-plant) and
 correctly rejects each bad case with the right reason:
 
 | Test image | Result |
@@ -113,7 +113,7 @@ Run it yourself: `python image_verification.py test_images/dark_leaf.jpg`
 
 ### Step 13 — Severity Estimation (tested)
 
-`ml/severity_estimation.py` was tested against synthetic leaves with
+`model/severity_estimation.py` was tested against synthetic leaves with
 known diseased-area percentages and correctly produced all 4 stages:
 
 | Test image | Diseased area | Stage |
@@ -143,7 +143,7 @@ Run it yourself: `python severity_estimation.py test_images/critical_leaf.jpg`
 
 ### Steps 14-16 — Disease → Severity → Treatment/Prevention mapping
 
-`ml/treatment_recommendations.py` is the single source of truth:
+`model/treatment_recommendations.py` is the single source of truth:
 a `TREATMENT_MAP` dict keyed by the exact class names from
 `supported_crops.py`, each mapped to G1/G2/G3 recommendation +
 prevention text (G0/healthy classes only need a G0 entry - a model
@@ -163,7 +163,7 @@ sync with each other.
 
 ### Step 17 — Connected to AI prediction (tested end-to-end)
 
-`ml/pipeline.py` chains everything into one function matching the
+`model/pipeline.py` chains everything into one function matching the
 project's Final System Flow diagram exactly:
 
 ```
@@ -286,10 +286,10 @@ doc, not a hard dependency - but schema must run first for both).
 
 ### Steps 38-41 — Automated test suite (52 tests, all passing)
 
-`ml/tests/` is a real pytest suite, not ad-hoc manual script runs:
+`model/tests/` is a real pytest suite, not ad-hoc manual script runs:
 
 ```bash
-cd ml
+cd model
 pip install pytest --break-system-packages
 python -m pytest tests/ -v
 ```
@@ -424,7 +424,7 @@ for i, example in enumerate(ds):
 Once `./dataset/` is populated:
 
 ```bash
-cd ml
+cd model
 python train_mobilevit.py --data_dir ./dataset --epochs 15
 ```
 
@@ -443,7 +443,7 @@ first run (needs internet access once, for that download only).
 | `mobile_app/lib/services/inference_service.dart` | Hardcoded `38` classes, dummy return | Real class count + parsed prediction after training |
 | `mobile_app/lib/screens/capture/capture_screen.dart` | Hardcoded demo diagnosis | Real call to `InferenceService` + severity pipeline |
 | `mobile_app/lib/screens/assistant_screen.dart` | Placeholder reply | Supabase Edge Function calling an LLM API |
-| `ml/severity_estimation.py` | `SEVERITY_THRESHOLDS` | Tune against ~50-100 hand-checked images per crop |
+| `model/severity_estimation.py` | `SEVERITY_THRESHOLDS` | Tune against ~50-100 hand-checked images per crop |
 
 ---
 

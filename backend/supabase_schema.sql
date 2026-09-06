@@ -182,7 +182,7 @@ comment on column public.diagnoses.severity_stage is
 -- One row per crop a farmer is tracking a growth cycle for. The
 -- growth-stage calendar itself (which day ranges map to which of the
 -- 5 stages, per crop) is static reference data that lives in the app
--- code (ml/crop_growth_calendar.py, mirrored in Dart) rather than a
+-- code (model/crop_growth_calendar.py, mirrored in Dart) rather than a
 -- database table - only the farmer-specific planting date needs to be
 -- stored and queried per user.
 create table if not exists public.crop_growth_tracking (

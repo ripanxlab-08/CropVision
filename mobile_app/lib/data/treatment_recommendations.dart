@@ -1,4 +1,4 @@
-// AUTO-GENERATED from ml/treatment_recommendations.py - regenerate
+// AUTO-GENERATED from model/treatment_recommendations.py - regenerate
 // this file whenever that one changes, rather than hand-editing,
 // to keep the Flutter app and the Python ML pipeline in sync.
 

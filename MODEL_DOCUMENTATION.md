@@ -14,12 +14,12 @@ Recommendation Mapping → Diagnosis History
 ```
 
 No image reaches disease classification without first passing the
-two validation gates. Implementation: `ml/pipeline.py` (`run_diagnosis`),
+two validation gates. Implementation: `model/pipeline.py` (`run_diagnosis`),
 mirrored in `mobile_app/lib/screens/capture/capture_screen.dart`.
 
 **G0–G3 disease severity and the 5 crop growth stages are separate,
 independent outputs** — implemented in different files
-(`ml/severity_estimation.py` vs `ml/crop_growth_calendar.py`), computed
+(`model/severity_estimation.py` vs `model/crop_growth_calendar.py`), computed
 from different inputs (disease-affected leaf-area % vs. days-since-
 planting), and never conflated in the UI.
 
@@ -38,7 +38,7 @@ planting), and never conflated in the UI.
    percentage, verified empirically during development).
 4. Map the percentage to a stage using the thresholds below.
 
-**Default thresholds** (`ml/severity_estimation.py`,
+**Default thresholds** (`model/severity_estimation.py`,
 `DEFAULT_SEVERITY_THRESHOLDS`):
 
 | Stage | Range | Meaning |
@@ -62,7 +62,7 @@ assignment.
 
 ## 3. Data Augmentation (Mandatory Per Spec)
 
-Implemented in `ml/train_mobilevit.py`, `build_transforms(train=True)`.
+Implemented in `model/train_mobilevit.py`, `build_transforms(train=True)`.
 Applied ONLY to the training split — validation and test images are
 never augmented, so reported accuracy reflects real, unmodified
 photos.

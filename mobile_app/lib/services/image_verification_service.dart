@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
-/// Dart port of ml/image_verification.py so the same quality/validity
+/// Dart port of model/image_verification.py so the same quality/validity
 /// checks run on-device before an image is uploaded (saves bandwidth
 /// on obviously-bad photos and gives instant feedback to the farmer).
 ///

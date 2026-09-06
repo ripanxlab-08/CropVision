@@ -2,7 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
 
-/// Dart port of ml/severity_estimation.py. Same union-of-healthy-and-
+/// Dart port of model/severity_estimation.py. Same union-of-healthy-and-
 /// diseased-tissue leaf mask fix that was needed on the Python side -
 /// see that file's docstring for why: diseased/necrotic pixels must be
 /// counted as leaf area too, or severity gets silently deflated.
@@ -29,7 +29,7 @@ class SeverityEstimationService {
   };
 
   // Per-crop overrides, mirroring
-  // ml/severity_estimation.py's CROP_SEVERITY_THRESHOLD_OVERRIDES -
+  // model/severity_estimation.py's CROP_SEVERITY_THRESHOLD_OVERRIDES -
   // empty until crop-specific cutoffs are validated against real
   // hand-checked photos per crop. Falls back to _defaultThresholds
   // for any crop not listed here.

@@ -15,11 +15,11 @@ import '../../widgets/gradient_app_bar.dart';
 
 // Below this confidence, treat the image as "not one of the crops
 // this model was trained on" rather than force-accepting a low-
-// confidence guess. Mirrors ml/pipeline.py's threshold exactly - keep
+// confidence guess. Mirrors model/pipeline.py's threshold exactly - keep
 // both in sync. See that file's comment for the full reasoning.
 const double kUnknownCropConfidenceThreshold = 0.6;
 
-// The trained model runs on a local Python server (ml/inference_server.py),
+// The trained model runs on a local Python server (model/inference_server.py),
 // not on-device - this avoids adding another native Android dependency
 // (pytorch_lite/tflite/onnxruntime) on top of an already fragile
 // NDK/build setup. Reach it via `adb reverse tcp:8000 tcp:8000` over
@@ -61,7 +61,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
   }
 
   /// Calls the real trained model, served locally by
-  /// ml/inference_server.py. Tries localhost (USB adb reverse) first,
+  /// model/inference_server.py. Tries localhost (USB adb reverse) first,
   /// then falls back to the PC's Wi-Fi IP (10.12.103.0).
   Future<(String, double)> _classifyDisease(Uint8List bytes) async {
     final candidateUrls = [
@@ -99,7 +99,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
         'Cannot reach ML Inference Server.\n\n'
         '• If phone is connected via USB: Run "adb reverse tcp:8000 tcp:8000" on PC.\n'
         '• If on Wi-Fi: Ensure phone & PC are on the same network.\n'
-        '• Ensure "python ml/inference_server.py" is running on PC.\n'
+        '• Ensure "python model/inference_server.py" is running on PC.\n'
         'Details: $lastError');
   }
 
