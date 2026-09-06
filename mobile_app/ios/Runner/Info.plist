@@ -72,6 +72,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>cropvision</string>
 				<string>io.supabase.cropvision</string>
 				<string>com.googleusercontent.apps.199909588025-o79vcm3bu64rau0m36h68u02d7ivhn55</string>
 			</array>

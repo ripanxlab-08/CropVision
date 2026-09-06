@@ -37,7 +37,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      setState(() => _error = e.toString());
+      final errStr = e.toString();
+      if (errStr.contains('Failed host lookup') || errStr.contains('SocketException')) {
+        setState(() => _error = 'Network Error: Cannot connect to server. Please check your device\'s internet connection.');
+      } else {
+        setState(() => _error = errStr);
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

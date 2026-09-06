@@ -46,7 +46,7 @@ class SupabaseService {
   Future<bool> signInWithGoogle() {
     return _client.auth.signInWithOAuth(
       OAuthProvider.google,
-      redirectTo: kIsWeb ? Uri.base.origin : 'io.supabase.cropvision://login-callback',
+      redirectTo: kIsWeb ? Uri.base.origin : 'cropvision://login-callback',
     );
   }
 
@@ -60,7 +60,7 @@ class SupabaseService {
   Future<bool> signInWithApple() {
     return _client.auth.signInWithOAuth(
       OAuthProvider.apple,
-      redirectTo: kIsWeb ? Uri.base.origin : 'io.supabase.cropvision://login-callback',
+      redirectTo: kIsWeb ? Uri.base.origin : 'cropvision://login-callback',
     );
   }
 

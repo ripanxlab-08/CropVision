@@ -36,9 +36,12 @@ class _SignupScreenState extends State<SignupScreen> {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
-      // Show the REAL error, not a generic message - this is what lets
-      // us actually diagnose what's wrong instead of guessing blind.
-      setState(() => _error = e.toString());
+      final errStr = e.toString();
+      if (errStr.contains('Failed host lookup') || errStr.contains('SocketException')) {
+        setState(() => _error = 'Network Error: Cannot connect to server. Please check your device\'s internet connection.');
+      } else {
+        setState(() => _error = errStr);
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }

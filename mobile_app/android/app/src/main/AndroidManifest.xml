@@ -35,6 +35,9 @@
                 <data
                     android:scheme="io.supabase.cropvision"
                     android:host="login-callback" />
+                <data
+                    android:scheme="cropvision"
+                    android:host="login-callback" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
