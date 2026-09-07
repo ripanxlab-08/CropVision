@@ -26,7 +26,9 @@ project/
 
 ## Phase 1 — Environment Setup
 
-### 1. Flutter setup
+### 1. Flutter Setup
+
+
 
 ```bash
 # Install Flutter SDK (if not already): https://docs.flutter.dev/get-started/install
