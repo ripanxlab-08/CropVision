@@ -33,3 +33,5 @@ ml/*.h5
 # General
 .DS_Store
 *.log
+*.code-workspace
+
