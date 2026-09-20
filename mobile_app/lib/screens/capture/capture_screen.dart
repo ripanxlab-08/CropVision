@@ -65,6 +65,7 @@ class _CaptureScreenState extends State<CaptureScreen> {
   /// then falls back to the PC's Wi-Fi IP (10.12.103.0).
   Future<(String, double)> _classifyDisease(Uint8List bytes) async {
     final candidateUrls = [
+      'http://10.179.243.22:8000/classify',
       'http://localhost:8000/classify',
       'http://10.12.103.0:8000/classify',
     ];
