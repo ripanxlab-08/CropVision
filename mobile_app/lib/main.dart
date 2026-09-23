@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'services/supabase_service.dart';
 import 'theme/app_theme.dart';
+import 'theme/theme_provider.dart';
 import 'screens/splash_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/auth/login_screen.dart';
@@ -37,23 +38,30 @@ class CropDiseaseApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider<SupabaseService>(create: (_) => SupabaseService()),
+        ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        title: 'CropVision',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.light,
-        initialRoute: '/',
-        routes: {
-          '/': (context) => const SplashScreen(),
-          '/onboarding': (context) => const OnboardingScreen(),
-          '/login': (context) => const LoginScreen(),
-          '/home': (context) => const HomeScreen(),
-          '/capture': (context) => const CaptureScreen(),
-          '/result': (context) => const ResultScreen(),
-          '/history': (context) => const HistoryScreen(),
-          '/calendar': (context) => const CalendarScreen(),
-          '/assistant': (context) => const AssistantScreen(),
-          '/settings': (context) => const SettingsScreen(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            title: 'CropVision',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.light,
+            darkTheme: AppTheme.dark,
+            themeMode: themeProvider.themeMode,
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const SplashScreen(),
+              '/onboarding': (context) => const OnboardingScreen(),
+              '/login': (context) => const LoginScreen(),
+              '/home': (context) => const HomeScreen(),
+              '/capture': (context) => const CaptureScreen(),
+              '/result': (context) => const ResultScreen(),
+              '/history': (context) => const HistoryScreen(),
+              '/calendar': (context) => const CalendarScreen(),
+              '/assistant': (context) => const AssistantScreen(),
+              '/settings': (context) => const SettingsScreen(),
+            },
+          );
         },
       ),
     );

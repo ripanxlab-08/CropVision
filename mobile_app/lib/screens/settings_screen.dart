@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../widgets/gradient_app_bar.dart';
 import '../theme/app_theme.dart';
+import '../theme/theme_provider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -14,19 +15,17 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _notificationsEnabled = true;
 
-  // Kept as a plain constant rather than reading it via a package like
-  // package_info_plus - avoids adding another native plugin dependency
-  // to an already fragile Android/NDK build setup for a single version
-  // string. Update this to match pubspec.yaml's version manually.
   static const String _appVersion = '0.1.0';
 
   @override
   Widget build(BuildContext context) {
     final service = context.read<SupabaseService>();
+    final themeProvider = context.watch<ThemeProvider>();
     final email = service.currentUser?.email ?? 'Not signed in';
+    final isDark = themeProvider.isDarkMode;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const GradientAppBar(title: 'Settings'),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -50,9 +49,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Account', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                      Text(
+                        'Account',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
                       const SizedBox(height: 2),
-                      Text(email, style: const TextStyle(color: AppColors.inkMuted, fontSize: 13)),
+                      Text(
+                        email,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -62,38 +74,75 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const _SettingsDivider(),
           const _SettingsSectionLabel('Preferences'),
           SwitchListTile(
-            secondary: const Icon(Icons.notifications_outlined, color: AppColors.inkMuted),
+            secondary: Icon(
+              isDark ? Icons.dark_mode_outlined : Icons.wb_sunny_outlined,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            title: const Text('Dark Mode'),
+            subtitle: Text(
+              isDark ? 'Using dark theme' : 'Using light theme',
+              style: const TextStyle(fontSize: 12.5),
+            ),
+            value: isDark,
+            activeThumbColor: AppColors.canopy,
+            activeTrackColor: isDark ? AppColors.neon : null,
+            onChanged: (_) => themeProvider.toggleTheme(),
+          ),
+          SwitchListTile(
+            secondary: Icon(
+              Icons.notifications_outlined,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             title: const Text('Reminder notifications'),
-            subtitle: const Text('Get notified about crop calendar reminders', style: TextStyle(fontSize: 12.5)),
+            subtitle: const Text(
+              'Get notified about crop calendar reminders',
+              style: TextStyle(fontSize: 12.5),
+            ),
             value: _notificationsEnabled,
-            activeThumbColor: AppColors.neon,
             onChanged: (v) => setState(() => _notificationsEnabled = v),
           ),
           const _SettingsDivider(),
           const _SettingsSectionLabel('Data'),
           ListTile(
-            leading: const Icon(Icons.history, color: AppColors.inkMuted),
+            leading: Icon(
+              Icons.history,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             title: const Text('Diagnosis history'),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: () => Navigator.pushNamed(context, '/history'),
           ),
           ListTile(
-            leading: const Icon(Icons.calendar_month_outlined, color: AppColors.inkMuted),
+            leading: Icon(
+              Icons.calendar_month_outlined,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             title: const Text('Crop calendar'),
             trailing: const Icon(Icons.chevron_right, size: 20),
             onTap: () => Navigator.pushNamed(context, '/calendar'),
           ),
           const _SettingsDivider(),
           const _SettingsSectionLabel('About'),
-          const ListTile(
-            leading: Icon(Icons.info_outline, color: AppColors.inkMuted),
-            title: Text('App version'),
-            trailing: Text(_appVersion, style: TextStyle(color: AppColors.inkMuted)),
+          ListTile(
+            leading: Icon(
+              Icons.info_outline,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            title: const Text('App version'),
+            trailing: Text(
+              _appVersion,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
-          const ListTile(
-            leading: Icon(Icons.eco_outlined, color: AppColors.inkMuted),
-            title: Text('About CropVision'),
-            subtitle: Text(
+          ListTile(
+            leading: Icon(
+              Icons.eco_outlined,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            title: const Text('About CropVision'),
+            subtitle: const Text(
               'AI-powered crop disease detection with real-time severity staging.',
               style: TextStyle(fontSize: 12.5),
             ),
@@ -137,7 +186,7 @@ class _SettingsSectionLabel extends StatelessWidget {
           fontSize: 11.5,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.6,
-          color: AppColors.inkMuted.withValues(alpha: 0.7),
+          color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
         ),
       ),
     );
@@ -149,6 +198,10 @@ class _SettingsDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(height: 1, color: AppColors.darkSurfaceElevated);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Divider(
+      height: 1,
+      color: isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurfaceElevated,
+    );
   }
 }

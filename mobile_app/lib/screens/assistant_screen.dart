@@ -66,8 +66,12 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cardBg = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    final mutedTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
+
     return Scaffold(
-      backgroundColor: AppColors.darkBg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const GradientAppBar(title: 'AI Assistant'),
       body: Column(
         children: [
@@ -87,9 +91,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                               size: 44, color: AppColors.canopy.withValues(alpha: 0.6)),
                         ),
                         const SizedBox(height: 12),
-                        Text('Ask me about your crops',
-                            style: TextStyle(
-                                color: AppColors.ink.withValues(alpha: 0.5))),
+                        Text('Ask me about your crops', style: TextStyle(color: mutedTextColor)),
                       ],
                     ),
                   )
@@ -102,37 +104,30 @@ class _AssistantScreenState extends State<AssistantScreen> {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Row(
-                          mainAxisAlignment: isUser
-                              ? MainAxisAlignment.end
-                              : MainAxisAlignment.start,
+                          mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             if (!isUser) ...[
                               CircleAvatar(
                                 radius: 15,
                                 backgroundColor: AppColors.canopy.withValues(alpha: 0.15),
-                                child: const Icon(Icons.eco,
-                                    size: 16, color: AppColors.canopy),
+                                child: const Icon(Icons.eco, size: 16, color: AppColors.canopy),
                               ),
                               const SizedBox(width: 8),
                             ],
                             Flexible(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 16, vertical: 12),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                 constraints: BoxConstraints(
-                                    maxWidth:
-                                        MediaQuery.of(context).size.width * 0.72),
+                                  maxWidth: MediaQuery.of(context).size.width * 0.72,
+                                ),
                                 decoration: BoxDecoration(
                                   gradient: isUser
                                       ? const LinearGradient(
-                                          colors: [
-                                            AppColors.canopy,
-                                            Color(0xFF3D6B42)
-                                          ],
+                                          colors: [AppColors.canopy, Color(0xFF3D6B42)],
                                         )
                                       : null,
-                                  color: isUser ? null : AppColors.darkSurface,
+                                  color: isUser ? null : cardBg,
                                   borderRadius: BorderRadius.only(
                                     topLeft: const Radius.circular(18),
                                     topRight: const Radius.circular(18),
@@ -141,7 +136,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.05),
+                                      color: Colors.black.withValues(alpha: 0.04),
                                       blurRadius: 8,
                                       offset: const Offset(0, 3),
                                     ),
@@ -150,8 +145,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
                                 child: Text(
                                   msg.content,
                                   style: TextStyle(
-                                      color:
-                                          isUser ? Colors.white : AppColors.ink),
+                                    color: isUser ? Colors.white : textColor,
+                                  ),
                                 ),
                               ),
                             ),
@@ -164,14 +159,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
           if (_sending)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: Text('Assistant is typing…',
-                  style: TextStyle(color: AppColors.ink.withValues(alpha: 0.5))),
+              child: Text('Assistant is typing…', style: TextStyle(color: mutedTextColor)),
             ),
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 8, 12, 16),
             child: Container(
               decoration: BoxDecoration(
-                color: AppColors.darkSurface,
+                color: cardBg,
                 borderRadius: BorderRadius.circular(28),
                 boxShadow: [
                   BoxShadow(

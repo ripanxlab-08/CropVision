@@ -4,7 +4,6 @@ import '../services/supabase_service.dart';
 import '../models/diagnosis.dart';
 import '../widgets/severity_badge.dart';
 import '../widgets/gradient_app_bar.dart';
-import '../theme/app_theme.dart';
 
 class HistoryScreen extends StatelessWidget {
   const HistoryScreen({super.key});
@@ -12,9 +11,12 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = context.read<SupabaseService>();
+    final cardBg = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+    final textColor = Theme.of(context).colorScheme.onSurface;
+    final mutedTextColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: const GradientAppBar(title: 'Diagnosis History'),
       body: FutureBuilder<List<Diagnosis>>(
         future: service.fetchDiagnosisHistory(),
@@ -31,11 +33,9 @@ class HistoryScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.history,
-                      size: 56, color: AppColors.ink.withValues(alpha: 0.25)),
+                  Icon(Icons.history, size: 56, color: mutedTextColor.withValues(alpha: 0.4)),
                   const SizedBox(height: 12),
-                  Text('No diagnoses yet',
-                      style: TextStyle(color: AppColors.ink.withValues(alpha: 0.5))),
+                  Text('No diagnoses yet', style: TextStyle(color: mutedTextColor)),
                 ],
               ),
             );
@@ -49,11 +49,11 @@ class HistoryScreen extends StatelessWidget {
               final color = severityColor(d.severityStage);
               return Container(
                 decoration: BoxDecoration(
-                  color: AppColors.darkSurface,
+                  color: cardBg,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
@@ -113,25 +113,21 @@ class HistoryScreen extends StatelessWidget {
                               children: [
                                 Text(
                                   d.predictedDisease ?? 'Unverified image',
-                                  style: const TextStyle(fontWeight: FontWeight.w600),
+                                  style: TextStyle(fontWeight: FontWeight.w600, color: textColor),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 2),
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                       decoration: BoxDecoration(
                                         color: color.withValues(alpha: 0.12),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(
                                         d.severityStage?.code ?? '-',
-                                        style: TextStyle(
-                                            color: color,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700),
+                                        style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -139,9 +135,7 @@ class HistoryScreen extends StatelessWidget {
                                       d.createdAt != null
                                           ? '${d.createdAt!.day}/${d.createdAt!.month}/${d.createdAt!.year}'
                                           : '',
-                                      style: TextStyle(
-                                          fontSize: 12,
-                                          color: AppColors.ink.withValues(alpha: 0.5)),
+                                      style: TextStyle(fontSize: 12, color: mutedTextColor),
                                     ),
                                   ],
                                 ),
@@ -154,9 +148,7 @@ class HistoryScreen extends StatelessWidget {
                             padding: const EdgeInsets.only(right: 16),
                             child: Text(
                               '${(d.confidence! * 100).toStringAsFixed(0)}%',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.ink.withValues(alpha: 0.6)),
+                              style: TextStyle(fontWeight: FontWeight.w600, color: mutedTextColor),
                             ),
                           ),
                       ],

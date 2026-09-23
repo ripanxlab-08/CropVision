@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/supabase_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/theme_provider.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -9,9 +10,12 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = context.read<SupabaseService>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDarkMode;
+    final iconColor = Theme.of(context).colorScheme.onSurfaceVariant;
 
     return Scaffold(
-      backgroundColor: AppColors.darkBg,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: RefreshIndicator(
         onRefresh: () async {},
         child: SingleChildScrollView(
@@ -19,27 +23,51 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header - no longer a giant gradient banner, just a
-              // simple top bar. The visual weight moves to the health
-              // overview card below instead, which now carries the
-              // actual information rather than the header carrying
-              // decoration.
+              // Header top bar with Field Dashboard title and actions
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 12, 0),
+                padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
                 child: SafeArea(
                   bottom: false,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Field Dashboard', style: Theme.of(context).textTheme.headlineSmall),
+                      Text(
+                        'Field Dashboard',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
+                          // 1. Settings icon
                           IconButton(
-                            icon: const Icon(Icons.settings_outlined, color: AppColors.inkMuted),
+                            icon: const Icon(Icons.settings_outlined),
+                            color: iconColor,
+                            iconSize: 22,
+                            padding: const EdgeInsets.all(8),
+                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                            tooltip: 'Settings',
                             onPressed: () => Navigator.pushNamed(context, '/settings'),
                           ),
+                          // 2. Middle Icon: Light / Dark Mode Toggle Icon (Brightness / Sun / Moon)
                           IconButton(
-                            icon: const Icon(Icons.logout, color: AppColors.inkMuted),
+                            icon: Icon(
+                              isDark ? Icons.wb_sunny_outlined : Icons.dark_mode_outlined,
+                            ),
+                            color: iconColor,
+                            iconSize: 22,
+                            padding: const EdgeInsets.all(8),
+                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                            tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+                            onPressed: () => themeProvider.toggleTheme(),
+                          ),
+                          // 3. Logout icon
+                          IconButton(
+                            icon: const Icon(Icons.logout),
+                            color: iconColor,
+                            iconSize: 22,
+                            padding: const EdgeInsets.all(8),
+                            constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
+                            tooltip: 'Log out',
                             onPressed: () async {
                               await service.signOut();
                               if (context.mounted) {
@@ -54,7 +82,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
                 child: FutureBuilder<DashboardStats>(
                   future: service.fetchDashboardStats(),
                   builder: (context, snapshot) {
@@ -69,10 +97,6 @@ class HomeScreen extends StatelessWidget {
                   children: [
                     Text('Quick actions', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 14),
-                    // Bento layout: one large primary action, three
-                    // smaller secondary actions - not a uniform grid.
-                    // Diagnose Leaf is the thing someone opens this app
-                    // to do most often, so it gets the visual weight.
                     _HeroActionCard(
                       icon: Icons.camera_alt,
                       label: 'Diagnose Leaf',
@@ -105,7 +129,7 @@ class HomeScreen extends StatelessWidget {
                           child: _SmallActionCard(
                             icon: Icons.smart_toy,
                             label: 'Assistant',
-                            color: AppColors.neon,
+                            color: isDark ? AppColors.neon : AppColors.canopy,
                             onTap: () => Navigator.pushNamed(context, '/assistant'),
                           ),
                         ),
@@ -122,11 +146,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-/// Replaces the old "3 identical number boxes" with one card that
-/// actually visualizes the healthy/needs-attention split as a
-/// proportion (a segmented bar), not just three disconnected counts -
-/// this answers "how is my field doing overall" at a glance instead of
-/// making the farmer do the subtraction themselves.
 class _HealthOverviewCard extends StatelessWidget {
   final DashboardStats? stats;
   final bool loading;
@@ -138,14 +157,23 @@ class _HealthOverviewCard extends StatelessWidget {
     final healthy = stats?.healthyCount ?? 0;
     final needsAttention = stats?.needsAttentionCount ?? 0;
     final healthyFraction = total == 0 ? 0.5 : healthy / total;
+    final cardBg = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: isDark ? AppColors.neon.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.05),
+        ),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 20, offset: const Offset(0, 8)),
+          BoxShadow(
+            color: isDark ? Colors.black.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.04),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Column(
@@ -159,9 +187,15 @@ class _HealthOverviewCard extends StatelessWidget {
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontSize: 36),
               ),
               const SizedBox(width: 8),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 6),
-                child: Text('scans this season', style: TextStyle(color: AppColors.inkMuted, fontSize: 14)),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text(
+                  'scans this season',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ],
           ),
@@ -171,17 +205,27 @@ class _HealthOverviewCard extends StatelessWidget {
             child: SizedBox(
               height: 12,
               child: loading
-                  ? Container(color: AppColors.darkSurfaceElevated)
+                  ? Container(
+                      color: isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurfaceElevated,
+                    )
                   : Row(
                       children: [
                         if (healthy > 0)
-                          Expanded(flex: (healthyFraction * 100).round().clamp(1, 100), child: Container(color: AppColors.canopy)),
+                          Expanded(
+                            flex: (healthyFraction * 100).round().clamp(1, 100),
+                            child: Container(color: AppColors.canopy),
+                          ),
                         if (needsAttention > 0)
                           Expanded(
                             flex: ((1 - healthyFraction) * 100).round().clamp(1, 100),
                             child: Container(color: AppColors.rust),
                           ),
-                        if (total == 0) Expanded(child: Container(color: AppColors.darkSurfaceElevated)),
+                        if (total == 0)
+                          Expanded(
+                            child: Container(
+                              color: isDark ? AppColors.darkSurfaceElevated : AppColors.lightSurfaceElevated,
+                            ),
+                          ),
                       ],
                     ),
             ),
@@ -210,19 +254,24 @@ class _LegendDot extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
         const SizedBox(width: 6),
-        Text(label, style: const TextStyle(color: AppColors.inkMuted, fontSize: 13)),
+        Text(
+          label,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 13,
+          ),
+        ),
       ],
     );
   }
 }
 
-/// The single large primary action - full width, more generous
-/// padding, an icon watermark ghosted in the background for texture,
-/// and a subtitle explaining what happens when tapped. Structurally
-/// distinct from the small cards below, not just a bigger version of
-/// the same thing.
 class _HeroActionCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -250,7 +299,11 @@ class _HeroActionCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 24, offset: const Offset(0, 10)),
+          BoxShadow(
+            color: color.withValues(alpha: 0.3),
+            blurRadius: 24,
+            offset: const Offset(0, 10),
+          ),
         ],
       ),
       child: Stack(
@@ -281,12 +334,22 @@ class _HeroActionCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(label,
-                              style: const TextStyle(
-                                  color: Colors.white, fontWeight: FontWeight.w700, fontSize: 19)),
+                          Text(
+                            label,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 19,
+                            ),
+                          ),
                           const SizedBox(height: 4),
-                          Text(subtitle,
-                              style: TextStyle(color: Colors.white.withValues(alpha: 0.85), fontSize: 13)),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 13,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -302,9 +365,6 @@ class _HeroActionCard extends StatelessWidget {
   }
 }
 
-/// Secondary actions - compact, icon-first, no gradient (visually
-/// quieter than the hero card on purpose, so the hierarchy reads
-/// correctly at a glance).
 class _SmallActionCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -320,11 +380,25 @@ class _SmallActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cardBg = Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.darkSurface,
+        color: cardBg,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        border: Border.all(
+          color: isDark ? color.withValues(alpha: 0.25) : color.withValues(alpha: 0.2),
+        ),
+        boxShadow: isDark
+            ? null
+            : [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -337,9 +411,15 @@ class _SmallActionCard extends StatelessWidget {
               children: [
                 Icon(icon, color: color, size: 24),
                 const SizedBox(height: 8),
-                Text(label,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
               ],
             ),
           ),
